@@ -1,133 +1,154 @@
 import fitz 
 import os
+from openai import AzureOpenAI
+from config import prompt_example
+import pandas as pd
 
 os.getcwd()
 
 def read_pdf(pdf_path):
     # Open the provided PDF file
     doc = fitz.open(pdf_path)
-    
     # Initialize a text variable to store all the extracted text
     full_text = ""
-    
     # Iterate through each page in the PDF
     for page in doc:
         # Extract text from the current page
         text = page.get_text()
-        
         # Append the extracted text to the full_text variable
         full_text += text + "\n"  # Add a newline character for readability
-    
     # Close the PDF document
     doc.close()
-    
     return full_text
 
-# Define the path to the PDF file
-pdf_path = os.getcwd() + "/input/CE2421EVK-c33ce-FR.pdf"
 
-# Call the function and print the result
-pdf_text = read_pdf(pdf_path)
-# print(pdf_text)
+def extract_information(pdf_path):
+    # Call the function and print the result
+    treated_pdf = read_pdf(pdf_path)
+
+    ## Appel api
+    client = AzureOpenAI(
+    azure_endpoint = "https://francecentral-openai.openai.azure.com/", 
+    api_key="7e93421f46cd4680831023addcb0f42d",  # clef d'api sous forme plus safe...
+    api_version="2024-02-15-preview"
+    )
+
+    # the system context is contained in config.py in the variable prompt_example
+    message_text = [{"role":"system","content":prompt_example},{"role":"user","content":treated_pdf}]
+
+    response = client.chat.completions.create(
+    model="gpt-35-turbo", 
+    messages = message_text,
+    temperature=0.,
+    max_tokens=800,
+    top_p=0.,
+    frequency_penalty=0,
+    presence_penalty=0,
+    stop=None
+    )
+
+    response_str = response.choices[0].message.content 
+    # output example 
+
+    # {
+    #   "code_ISIN": "XS2442385998",
+    #   "nom_du_produit": "Calliandra Mai 2028",
+    #   "emetteur_du_produit": "BNP Paribas Issuance B.V.",
+    #   "date_emission": "2023-03-08",
+    #   "date_remboursement": "2028-06-01",
+    #   "mention_complexite": true,
+    #   "montant_minimum_investissement": "Non spécifié",
+    #   "niveau_garantie": 1,
+    #   "niveau_barriere_desactivante": 100,
+    #   "niveau_risque": 2,
+    #   "produit_sous_jacent": "Indice EURO STOXX 50",
+    #   "nature_sous_jacent": "indice",
+    #   "code_ISIN_sous_jacent": "Non applicable",
+    #   "frais_ponctuels_entree": "3.96%",
+    #   "frais_ponctuels_sortie": "0.5% du montant nominal",
+    #   "frais_recurrents": "0% de votre investissement par an",
+    #   "frais_accessoires": "Aucune commission liée aux résultats n'existe pour ce produit",
+    #   "performance_tension": "-13.01%",
+    #   "performance_maximale": "4.67%",
+    #   "espérance_maximale_rendement": "Non spécifié"
+    # }
+
+    # response_str is a string containing the JSON response from the API
+    # we want to extract the JSON from the string and convert it to a dictionary
+    response_str = response_str[8:-3]
+    response_str = response_str.replace('{', '')
+    response_str = response_str.replace('}', '')
+    response_str = response_str.replace('\n', '')
+    response_str = response_str.replace('\n ', '')
+    response_str = response_str.replace(' \n', '')
+    response_str = response_str.replace('  ', '')
+    result = {}
+    response_str = response_str.split(',')
+    for text in response_str:
+        ligne = text.split(": ")
+        key, value = ligne[0].replace('"', ''), ligne[1].replace('"', '')
+        result[key] = value
+
+    #view the result
+    # for i in result.keys():
+    #     print(i, ":", result[i])
+
+    # save the result in the csv file of the output folder
+
+    # final version of the columns
+    # true_columns = [
+    #     "code_ISIN",
+    #     "nom_du_produit",
+    #     "emetteur_du_produit",
+    #     "date_emission",
+    #     "date_remboursement",
+    #     "mention_complexite",
+    #     "montant_minimum_investissement",
+    #     "niveau_garantie",
+    #     "niveau_barriere_desactivante",
+    #     "niveau_risque",
+    #     "produit_sous_jacent",
+    #     "nature_sous_jacent",
+    #     "code_ISIN_sous_jacent",
+    #     "frais_ponctuels_entree",
+    #     "frais_ponctuels_sortie_echeance",
+    #     "frais_ponctuels_sortie_anticipée",
+    #     "frais_recurrents",
+    #     "frais_accessoires",
+    #     "performance_tension",
+    #     "performance_maximale",
+    #     "espérance_maximale_rendement"
+    # ]
+
+    # meanwhile we will use the following columns
+    columns = ["code_ISIN", "nom_du_produit", "emetteur_du_produit", "date_emission", "date_remboursement", "mention_complexite", "montant_minimum_investissement", "niveau_garantie", "niveau_barriere_desactivante", "niveau_risque", "produit_sous_jacent", "nature_sous_jacent", "code_ISIN_sous_jacent", "frais_ponctuels_entree", "frais_ponctuels_sortie", "frais_recurrents", "frais_accessoires", "performance_tension", "performance_maximale", "espérance_maximale_rendement"]
+
+    if os.listdir("output") == []:
+        data = pd.DataFrame(columns=columns)
+    else:
+        data = pd.read_csv("output/bdd_DIC.csv")
+
+
+    if result['code_ISIN'] in data['code_ISIN'].values:
+        print(f"Le document avec l'ISIN {result['code_ISIN']} déjà été traité")
+    else:
+        # result is a dictionary containing the extracted information
+        # Add the result to the DataFrame without using append
+        data = data.append(result, ignore_index=True)
+        data.to_csv("output/bdd_DIC.csv", index=False)
+
+
+# now we want to read all the pdf files in the input folder and extract the information from them
+
+
+print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+print("EXEMPLES INCOMPLETS DANS LES DOSSIERS : 20 features seulement, il faut corriger les json mis en examples")
+print("Rajouter un champs pour la date d'actualisation de traitement du document")
+print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
 
 
 
-
-
-
-
-## Appel api
-
-import os
-from openai import AzureOpenAI
-
-
-client = AzureOpenAI(
-  azure_endpoint = "https://francecentral-openai.openai.azure.com/", 
-  api_key="7e93421f46cd4680831023addcb0f42d",  
-  api_version="2024-02-15-preview"
-)
-
-
-message_text = [{"role":"system","content":"You are an AI assistant that helps people find information."},{"role":"user","content":"give me the recipe for crepes"}]
-
-
-completion = client.chat.completions.create(
-  model="gpt-35-turbo", 
-  messages = message_text,
-  temperature=0.7,
-  max_tokens=800,
-  top_p=0.95,
-  frequency_penalty=0,
-  presence_penalty=0,
-  stop=None
-)
-
-print(completion)
-
-
-# prompt
-class StructuredProductAnalysisModel:
-    """
-# Persona :
-Vous êtes un expert en finance, particulièrement dans les produits structurés. Vous êtes spécialisé dans l'analyse des Documents d'Informations Clés (DIC). Vous êtes un expert fiable et méticuleux dans votre travail.
-
-Objectif :
-Votre tâche consiste à extraire des informations précises des Documents d'Informations Clés. Parfois, vous pourriez avoir besoin d'interpréter certaines informations si la réponse n'est pas explicite, mais ne jamais inventer d'informations.
-
-Règles :
-Pour chaque document présenté, extraire les informations suivantes lorsqu'elles sont présentes :
-
-1.Code ISIN du produit
-2.Nom du produit
-3.Émetteur du produit
-4.Date d'émission du produit
-5.Date de remboursement, également appelée date d'échéance, du produit
-6.Mention de "Vous êtes sur le point d'acheter un produit qui n'est pas simple et peut être difficile à comprendre."
-7.Montant minimum d'investissement
-8.Niveau de garantie du produit. C'est un nombre entre 0 et 1 représentant le pourcentage de capital garanti. Si le capital n'est pas garanti, retourner 0.
-9.Niveau de barrière de désactivation. Si non présent, retourner 0. Sinon, retourner le pourcentage de baisse de l'actif sous-jacent à partir duquel la barrière est désactivée.
-10.Niveau de risque, également appelé SRI. C'est un nombre entre 1 et 7. Il est souvent mentionné dans une phrase standard comme : nous avons classé ce produit dans la classe de risque x/7, ou ce produit est dans la classe de risque x/7.
-11.Nom du produit sous-jacent
-12.Nature du produit sous-jacent. Par exemple : indice, action, obligation, produit interne, fonds.
-13.Code ISIN ou Bloomberg du produit sous-jacent.
-14.Frais d'entrée ponctuels.
-15.Frais de sortie ponctuels. Par exemple, frais en cas de sortie à l'échéance.
-16.Frais de sortie ponctuels. Par exemple, frais en cas de sortie anticipée.
-17.Frais récurrents (ou frais de gestion), parfois mentionnés comme "frais dans le temps".
-18.Frais annexes, par exemple commission de performance, ou commission liée au résultat.
-19.Performance attendue du produit à l'échéance dans un scénario de stress.
-20.Performance attendue du produit à l'échéance dans un scénario de performance maximale.
-21.Performance attendue du produit, le rendement maximal attendu, parfois appelé coupon final.
-
-Les résultats doivent être retournés uniquement au format JSON.
-
-Exemples :
-    """
-
-    def analyze_kid(self, document_text):
-        # Example analysis logic (pseudo-code)
-        results = {
-            "ISIN_code": "extracted or interpreted ISIN code",
-            "Product_name": "extracted product name",
-            # Continue for each required piece of information
-        }
-        
-        # Your code to analyze the document_text and extract information goes here
-
-        return results
-
-# Example usage
-analyzer = StructuredProductAnalysisModel()
-document_text = "Your KID document text here"
-analysis_results = analyzer.analyze_kid(document_text)
-print(analysis_results)
-
-
-# save to a data set
-
-import pandas as pd
-
-columns =  ["code_ISIN", "nom_du_produit", "emetteur_du_produit", "date_emission", "date_remboursement", "mention_complexite", "montant_minimum_investissement", "niveau_garantie", "niveau_barriere_desactivante", "niveau_risque", "produit_sous_jacent", "nature_sous_jacent", "code_ISIN_sous_jacent", "frais_ponctuels_entree", "frais_ponctuels_sortie_echeance", "frais_ponctuels_sortie_anticipe", "frais_recurrents", "frais_accessoires", "performance_tension", "performance_maximale", "espérance_maximale_rendement"]
-
- 
+files = os.listdir("input")
+for file in files:
+    pdf_path = os.getcwd() + f"/input/{file}"
+    extract_information(pdf_path)
