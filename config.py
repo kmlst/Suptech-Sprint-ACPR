@@ -1,18 +1,16 @@
-import json 
+import json
 
-with open('example1.json') as f:
-    example_1 = json.load(f)
-with open('example2.json') as f:
-    example_2 = json.load(f)
-with open('example3.json') as f:
-    example_3 = json.load(f)
-with open('example4.json') as f:
-    example_4 = json.load(f)
-with open('example5.json') as f:
-    example_5 = json.load(f)
-with open('example6.json') as f:
-    example_6 = json.load(f)
+file_names = ['example1.json', 'example2.json', 'example3.json', 'example4.json', 'example5.json', 'example6.json']
 
+# Dictionary to hold the content of each file
+examples = {}
+
+# Looping through the file names, opening, and loading each one
+for file_name in file_names:
+    with open(file_name) as f:
+        examples[file_name] = json.load(f)
+
+# Now, examples['example1.json'] will give you the contents of the first file, and so on.
 
 prompt_example = f"""
 # Persona :
@@ -49,11 +47,11 @@ Pour chaque document présenté, extraire les informations suivantes lorsqu'elle
 Les résultats doivent être retournés uniquement au format JSON.
 
 Exemples :
-{example_1}
-{example_2}
-{example_3}
-{example_4}
-{example_5}
-{example_6}
+{examples['example1.json']}
+{examples['example2.json']}
+{examples['example3.json']}
+{examples['example4.json']}
+{examples['example5.json']}
+{examples['example6.json']}
 
 """
