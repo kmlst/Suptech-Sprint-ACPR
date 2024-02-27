@@ -1,9 +1,7 @@
-# VeriDIC
-
-La donnée, à portée de clic.
+# VeriDIC - La donnée, à portée de clic.
 
 ## Vue d'ensemble
-Le Système de Récupération de Données des Documents Financiers (SRDDF) est conçu pour automatiser le processus d'extraction de données à partir des DICs (documents financiers). Ce système utilise des Modèles de Langage à Grande Échelle (LLMs) pour interpréter intelligemment les documents financiers et les convertir en données structurées faciles à analyser et à traiter. Le système comprend une application web construite avec Streamlit pour faciliter l'interaction des utilisateurs et la navigation dans les données.
+VeriDIC est conçu pour automatiser le processus d'extraction de données des Documents d'Information Clef (DIC) ainsi que leur analyse. Ce système utilise GPT4 pour interpréter intelligemment les documents financiers et les convertir en données structurées faciles à analyser et à traiter. Le système comprend également une application web construite avec Streamlit pour faciliter l'interaction des utilisateurs et la navigation dans les données.
 
 ## Architecture du système
 
@@ -47,7 +45,3 @@ Le Système de Récupération de Données des Documents Financiers (SRDDF) est c
 5. **Détection d'anomalies** : Appliquez la fonctionnalité de détection d'anomalies pour préserver l'intégrité de vos données.
 
 ## Installation
-
-Pour configurer le SRDDF, suivez ces étapes :
-
-1. Clonez le dépôt :
