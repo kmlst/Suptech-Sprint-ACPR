@@ -124,3 +124,10 @@ analysis_results = analyzer.analyze_kid(document_text)
 print(analysis_results)
 
 
+# save to a data set
+
+import pandas as pd
+
+columns =  ["code_ISIN", "nom_du_produit", "emetteur_du_produit", "date_emission", "date_remboursement", "mention_complexite", "montant_minimum_investissement", "niveau_garantie", "niveau_barriere_desactivante", "niveau_risque", "produit_sous_jacent", "nature_sous_jacent", "code_ISIN_sous_jacent", "frais_ponctuels_entree", "frais_ponctuels_sortie_echeance", "frais_ponctuels_sortie_anticipe", "frais_recurrents", "frais_accessoires", "performance_tension", "performance_maximale", "espérance_maximale_rendement"]
+
+ 
