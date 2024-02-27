@@ -28,7 +28,12 @@ pdf_path = os.getcwd() + "/input/CE2421EVK-c33ce-FR.pdf"
 
 # Call the function and print the result
 pdf_text = read_pdf(pdf_path)
-print(pdf_text)
+# print(pdf_text)
+
+
+
+
+
 
 
 ## Appel api
@@ -115,3 +120,5 @@ analyzer = StructuredProductAnalysisModel()
 document_text = "Your KID document text here"
 analysis_results = analyzer.analyze_kid(document_text)
 print(analysis_results)
+
+
