@@ -1,0 +1,22 @@
+{
+  "code_ISIN": "FR1234567890",
+  "nom_du_produit": "Obligation Convertible Ecologique 2030",
+  "emetteur_du_produit": "La Banque Postale",
+  "date_emission": "2024-01-01",
+  "date_remboursement": "2030-01-01",
+  "mention_complexite": true,
+  "montant_minimum_investissement": "1000 EUR",
+  "niveau_garantie": 1,
+  "niveau_barriere_desactivante": "0%",
+  "niveau_risque": 2,
+  "produit_sous_jacent": "Projets Écologiques Européens",
+  "nature_sous_jacent": "obligation",
+  "code_ISIN_sous_jacent": "Non applicable",
+  "frais_ponctuels_entree": "1%",
+  "frais_ponctuels_sortie": "1%",
+  "frais_recurrents": "1% par an",
+  "frais_accessoires": "Non applicable",
+  "performance_tension": "Non spécifié",
+  "performance_maximale": "+5% par an",
+  "espérance_maximale_rendement": "Non spécifié"
+}

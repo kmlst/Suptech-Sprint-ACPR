@@ -1,0 +1,22 @@
+{
+  "code_ISIN": "NL0012123456",
+  "nom_du_produit": "Green Bond Energie Solaire 2025",
+  "emetteur_du_produit": "BNP Paribas",
+  "date_emission": "2025-01-20",
+  "date_remboursement": "2030-01-20",
+  "mention_complexite": false,
+  "montant_minimum_investissement": "2000 EUR",
+  "niveau_garantie": 1,
+  "niveau_barriere_desactivante": "0%",
+  "niveau_risque": 2,
+  "produit_sous_jacent": "Projet solaire BNP Paribas",
+  "nature_sous_jacent": "produit maison",
+  "code_ISIN_sous_jacent": "Non applicable",
+  "frais_ponctuels_entree": "2%",
+  "frais_ponctuels_sortie": "2%",
+  "frais_recurrents": "1% par an",
+  "frais_accessoires": "0%",
+  "performance_tension": "Non spécifié",
+  "performance_maximale": "5% par an",
+  "espérance_maximale_rendement": "5% par an"
+}

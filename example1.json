@@ -1,0 +1,22 @@
+{
+  "code_ISIN": "XS2523679699",
+  "nom_du_produit": "Athéna Trimestriel Action STMicroelectronics Novembre 2023",
+  "emetteur_du_produit": "BNP Paribas Issuance B.V.",
+  "date_emission": "2023-08-29",
+  "date_remboursement": "2028-07-04",
+  "mention_complexite": true,
+  "montant_minimum_investissement": "1000 EUR",
+  "niveau_garantie": 0,
+  "niveau_barriere_desactivante": "60%",
+  "niveau_risque": 5,
+  "produit_sous_jacent": "Action STMicroelectronics",
+  "nature_sous_jacent": "action",
+  "code_ISIN_sous_jacent": "NL0000226223",
+  "frais_ponctuels_entree": "2%",
+  "frais_ponctuels_sortie": "0%",
+  "frais_recurrents": "0.5% par an",
+  "frais_accessoires": "0%",
+  "performance_tension": "-46.44%",
+  "performance_maximale": "11.18%",
+  "espérance_maximale_rendement": "Non spécifié"
+}

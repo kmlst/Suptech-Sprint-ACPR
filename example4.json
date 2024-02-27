@@ -1,0 +1,22 @@
+{
+  "code_ISIN": "FR0012345678",
+  "nom_du_produit": "Obligation Convertible Autocall 2027",
+  "emetteur_du_produit": "Société Générale",
+  "date_emission": "2022-04-15",
+  "date_remboursement": "2027-04-15",
+  "mention_complexite": true,
+  "montant_minimum_investissement": "10000 EUR",
+  "niveau_garantie": 0.9,
+  "niveau_barriere_desactivante": "40%",
+  "niveau_risque": 4,
+  "produit_sous_jacent": "Indice Euro Stoxx 50",
+  "nature_sous_jacent": "indice",
+  "code_ISIN_sous_jacent": "EU0009658145",
+  "frais_ponctuels_entree": "1%",
+  "frais_ponctuels_sortie": "0%",
+  "frais_recurrents": "1.2% par an",
+  "frais_accessoires": "Commission de performance de 20% sur le rendement excédent 6%",
+  "performance_tension": "-10% à l'échéance",
+  "performance_maximale": "+8% par an",
+  "espérance_maximale_rendement": "+8% par an"
+}

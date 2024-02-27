@@ -1,0 +1,22 @@
+{
+  "code_ISIN": "LU0987654321",
+  "nom_du_produit": "Fonds Global Tech 2025",
+  "emetteur_du_produit": "BNP Paribas Asset Management",
+  "date_emission": "2022-05-20",
+  "date_remboursement": "2025-05-20",
+  "mention_complexite": false,
+  "montant_minimum_investissement": "500 EUR",
+  "niveau_garantie": 0,
+  "niveau_barriere_desactivante": "0%",
+  "niveau_risque": 5,
+  "produit_sous_jacent": "Actions Technologies Globales",
+  "nature_sous_jacent": "action",
+  "code_ISIN_sous_jacent": "Non applicable",
+  "frais_ponctuels_entree": "2%",
+  "frais_ponctuels_sortie": "2%",
+  "frais_recurrents": "2.5% par an",
+  "frais_accessoires": "Non applicable",
+  "performance_tension": "-20%",
+  "performance_maximale": "Jusqu'à +15% par an",
+  "espérance_maximale_rendement": "Non spécifié"
+}

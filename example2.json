@@ -1,0 +1,22 @@
+{
+  "code_ISIN": "FR0014000P32",
+  "nom_du_produit": "Autocall Rendement Crédit Agricole S.A. Décembre 2023",
+  "emetteur_du_produit": "Société Générale",
+  "date_emission": "2023-12-15",
+  "date_remboursement": "2029-06-15",
+  "mention_complexite": true,
+  "montant_minimum_investissement": "1000 EUR",
+  "niveau_garantie": 0,
+  "niveau_barriere_desactivante": "50%",
+  "niveau_risque": 4,
+  "produit_sous_jacent": "Action Crédit Agricole S.A.",
+  "nature_sous_jacent": "action",
+  "code_ISIN_sous_jacent": "FR0000045072",
+  "frais_ponctuels_entree": "3%",
+  "frais_ponctuels_sortie": "0%",
+  "frais_recurrents": "0.75% par an",
+  "frais_accessoires": "0%",
+  "performance_tension": "-60%",
+  "performance_maximale": "12.5%",
+  "espérance_maximale_rendement": "Non spécifié"
+}
