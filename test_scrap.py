@@ -92,7 +92,8 @@ Nom du produit sous-jacent
 Nature du produit sous-jacent. Par exemple : indice, action, obligation, produit interne, fonds.
 Code ISIN ou Bloomberg du produit sous-jacent.
 Frais d'entrée ponctuels.
-Frais de sortie ponctuels. Par exemple, frais en cas de sortie anticipée ou de sortie à l'échéance.
+Frais de sortie ponctuels. Par exemple, frais en cas de sortie à l'échéance.
+Frais de sortie ponctuels. Par exemple, frais en cas de sortie anticipée.
 Frais récurrents (ou frais de gestion), parfois mentionnés comme "frais dans le temps".
 Frais annexes, par exemple commission de performance, ou commission liée au résultat.
 Performance attendue du produit à l'échéance dans un scénario de stress.
