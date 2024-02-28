@@ -7,19 +7,16 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-NOM_CHAMP_MECA = '20. Résumé du mécanisme'
-COL_INDEX = "1. le code ISIN du produit"
-NAME_COL = "2. Le nom du produit"
+NOM_CHAMP_MECA = 'resume_mecanisme'
+COL_INDEX = "code_ISIN"
+NAME_COL = "nom_du_produit"
+
+from column_mapping import map_name
 
 # Load data
 @st.cache_data
 def load_data():
-    return pd.read_excel("../Exemples + résumés méca.xlsx").set_index(COL_INDEX)
-
-import streamlit as st
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
+    return pd.read_csv("output/bdd_DIC.csv").set_index(COL_INDEX)
 
 # @st.cache_data
 def new_tab(data, selected_index):
@@ -31,21 +28,21 @@ def new_tab(data, selected_index):
 def get_record(data, selected_index):
     st.header('Mécanisme du produit')
     st.subheader(f'Résumé pour {selected_index}, {data.loc[selected_index, NAME_COL]}')
-    # with st.expander('Resume'):
-    st.text(data.loc[selected_index, NOM_CHAMP_MECA])
+    st.markdown(data.loc[selected_index, NOM_CHAMP_MECA])
 
 
 def apply_filters(data, filter_values):
     numerical_fields = data.select_dtypes(include=['float64', 'int64']).columns
     filtered_data = data.copy()
 
-    for field, value in filter_values.items():
+    for old_field, value in filter_values.items():
+        field = old_field
         if value:
             if field in numerical_fields:
                 if "Greater than" in filter_values[field]['sign']:
-                    filtered_data = filtered_data[filtered_data[field] > value['value']]
+                    filtered_data = filtered_data[filtered_data[field] >= value['value']]
                 elif "Smaller than" in filter_values[field]['sign']:
-                    filtered_data = filtered_data[filtered_data[field] < value['value']]
+                    filtered_data = filtered_data[filtered_data[field] <= value['value']]
                 else:
                     filtered_data = filtered_data[filtered_data[field] == value['value']]
             else:
@@ -90,15 +87,16 @@ def dashboard(data):
             axes = axes.flatten()
             # num_cols = 2
             for i in range(0, len(all_fields), num_cols):
-                cols = st.columns(num_cols)
-                for j, field in enumerate(all_fields[i:i+num_cols]):
-                        if field in numerical_fields:
-                            fig = px.histogram(filtered_data, x=field, title=f"{field} Distribution")
-                            cols[j].plotly_chart(fig)
-                        else:
-                            fig = px.histogram(filtered_data, x=field, title=f"{field}")
-                            fig.update_xaxes(categoryorder="total descending")
-                            cols[j].plotly_chart(fig)
+                cols = st.columns(spec=[0.5, 0.5])
+                for j, old_field in enumerate(all_fields[i:i+num_cols]):
+                    field = list(map_name.keys())[list(map_name.values()).index(old_field)]   
+                    if field in numerical_fields:
+                        fig = px.histogram(filtered_data, x=field, title=f"{map_name[field]}")
+                        cols[j].plotly_chart(fig)
+                    else:
+                        fig = px.histogram(filtered_data, x=field, title=f"{map_name[field]}")
+                        fig.update_xaxes(categoryorder="total descending")
+                        cols[j].plotly_chart(fig)
 
             # Hide unused axes
             for j in range(num_plots, len(axes)):
@@ -137,9 +135,11 @@ if __name__ == "__main__":
     st.sidebar.header("Select Fields and Apply Filters")
     numerical_fields = data.select_dtypes(include=['float64', 'int64']).columns
     categorical_fields = data.select_dtypes(include=['object']).columns
-    all_fields = st.sidebar.multiselect("Champ à explorer", data.columns, key='col_cat_select')
+
+    all_fields = st.sidebar.multiselect("Champ à explorer", map_name.values(), key='col_cat_select')
     filter_values = {}
-    for field in all_fields:
+    for original_field in all_fields:
+        field = list(map_name.keys())[list(map_name.values()).index(original_field)]
         if field in numerical_fields:
             filter_type = st.sidebar.radio(f"Filter type for {field}", ["Greater than", "Smaller than", "Equal to"])
             filter_values[field] = {}
@@ -160,7 +160,6 @@ if __name__ == "__main__":
     if st.sidebar.button("Ouvrir le détail"):
         new_tab(data, selected_isin)
     else:
-        # dashboard(data)
         dashboard(data)
 
 
