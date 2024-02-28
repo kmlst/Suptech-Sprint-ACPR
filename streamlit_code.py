@@ -21,6 +21,7 @@ def main():
 
     # Sidebar for selecting fields
     st.sidebar.header("Select Fields and Apply Filters")
+    
     numerical_fields = st.sidebar.multiselect("Select Numerical Fields", data.select_dtypes(include=['float64', 'int64']).columns, key='col_select')
     categorical_fields = st.sidebar.multiselect("Select Categorical Fields", data.select_dtypes(include=['object']).columns, key = 'col_cat_select')
     filter_values = {}
@@ -55,7 +56,16 @@ def main():
                 filtered_data = filtered_data[filtered_data[field].isin(value)]
 
 
-       # Display selected fields
+    # Display selected fields
+    # Download filtered CSV
+    csv = filtered_data.to_csv(index=False)
+    st.download_button(label="Download filtered data CSV file", data=csv, file_name="filtered_data.csv", mime="text/csv")
+    # Display IDs of filtered rows
+    if len(filtered_data) < len(data):
+        st.subheader("Filtered Rows IDs")
+        st.write(filtered_data.index.tolist())
+
+        
     if numerical_fields or categorical_fields:
         selected_columns = numerical_fields + categorical_fields
         st.subheader("Selected Columns")
@@ -97,17 +107,6 @@ def main():
 
             plt.tight_layout()
             # st.pyplot(fig)
-
-
-    # Display IDs of filtered rows
-    if len(filtered_data) < len(data):
-        st.subheader("Filtered Rows IDs")
-        st.write(filtered_data.index.tolist())
-
-
-    # Download filtered CSV
-    csv = filtered_data.to_csv(index=False)
-    st.download_button(label="Download filtered data CSV file", data=csv, file_name="filtered_data.csv", mime="text/csv")
 
     # Open data record
     st.sidebar.header("Open Data Refiltered_datacord")
