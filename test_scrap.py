@@ -6,6 +6,7 @@ import pandas as pd
 
 os.getcwd()
 
+
 def read_pdf(pdf_path):
     # Open the provided PDF file
     doc = fitz.open(pdf_path)
@@ -35,7 +36,6 @@ def extract_information(pdf_path):
 
     # the system context is contained in config.py in the variable prompt_example
     message_text = [{"role":"system","content":prompt_example},{"role":"user","content":treated_pdf}]
-
     response = client.chat.completions.create(
     model="gpt-35-turbo", 
     messages = message_text,
@@ -86,14 +86,16 @@ def extract_information(pdf_path):
     response_str = response_str.split(',')
     for text in response_str:
         ligne = text.split(": ")
+        ligne = [i.strip() for i in ligne]
+        print(ligne)
         key, value = ligne[0].replace('"', ''), ligne[1].replace('"', '')
         result[key] = value
+    result = pd.dataframe(result, index=[0])
+    result["date_actualisation"] = pd.to_datetime("today").strftime("%Y-%m-%d")
 
     #view the result
     # for i in result.keys():
     #     print(i, ":", result[i])
-
-    # save the result in the csv file of the output folder
 
     # final version of the columns
     # true_columns = [
@@ -112,7 +114,7 @@ def extract_information(pdf_path):
     #     "code_ISIN_sous_jacent",
     #     "frais_ponctuels_entree",
     #     "frais_ponctuels_sortie_echeance",
-    #     "frais_ponctuels_sortie_anticipée",
+    #     "frais_ponctuels_sortie_anticipee",
     #     "frais_recurrents",
     #     "frais_accessoires",
     #     "performance_tension",
@@ -123,19 +125,24 @@ def extract_information(pdf_path):
     # meanwhile we will use the following columns
     columns = ["code_ISIN", "nom_du_produit", "emetteur_du_produit", "date_emission", "date_remboursement", "mention_complexite", "montant_minimum_investissement", "niveau_garantie", "niveau_barriere_desactivante", "niveau_risque", "produit_sous_jacent", "nature_sous_jacent", "code_ISIN_sous_jacent", "frais_ponctuels_entree", "frais_ponctuels_sortie", "frais_recurrents", "frais_accessoires", "performance_tension", "performance_maximale", "espérance_maximale_rendement"]
 
+
+    #check if the csv file exists and if not create it
     if os.listdir("output") == []:
-        data = pd.DataFrame(columns=columns)
+            data = pd.DataFrame(columns=columns)
     else:
         data = pd.read_csv("output/bdd_DIC.csv")
-
-
-    if result['code_ISIN'] in data['code_ISIN'].values:
+        
+    # save the result in the csv file of the output folder
+    if result["code_ISIN"] in data['code_ISIN'].values:
         print(f"Le document avec l'ISIN {result['code_ISIN']} déjà été traité")
     else:
         # result is a dictionary containing the extracted information
         # Add the result to the DataFrame without using append
         data = data.append(result, ignore_index=True)
+
+        # save the result in the csv file of the output folders
         data.to_csv("output/bdd_DIC.csv", index=False)
+
 
 
 # now we want to read all the pdf files in the input folder and extract the information from them
@@ -148,7 +155,9 @@ print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
 
 
 
+# list all the files in the input folder and extract the information from them
 files = os.listdir("input")
 for file in files:
     pdf_path = os.getcwd() + f"/input/{file}"
     extract_information(pdf_path)
+
