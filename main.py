@@ -40,7 +40,7 @@ def extract_information(pdf_path):
     model="gpt-35-turbo", 
     messages = message_text,
     temperature=0.,
-    max_tokens=800,
+    max_tokens=1200,
     top_p=0.,
     frequency_penalty=0,
     presence_penalty=0,
@@ -61,20 +61,22 @@ def extract_information(pdf_path):
     # and the text from the pdf to check if the result is correct
     # if not we mention the number of correctly extracted pieces of information
 
-    query = f"Here is the json file, {result} \n \n Here is the text from the pdf {treated_pdf}"
-    message_text = [{"role":"system","content":prompt_contrequalif},{"role":"user","content":query}]
-    response = client.chat.completions.create(
-    model="gpt-35-turbo", 
-    messages = message_text,
-    temperature=0.,
-    max_tokens=800,
-    top_p=0.,
-    frequency_penalty=0,
-    presence_penalty=0,
-    stop=None
-    )
+    # contrequalification
 
-    print(response.choices[0].message.content)
+    # query = f"Here is the json file, {result} \n \n Here is the text from the pdf {treated_pdf}"
+    # message_text = [{"role":"system","content":prompt_contrequalif},{"role":"user","content":query}]
+    # response = client.chat.completions.create(
+    # model="gpt-35-turbo", 
+    # messages = message_text,
+    # temperature=0.,
+    # max_tokens=800,
+    # top_p=0.,
+    # frequency_penalty=0,
+    # presence_penalty=0,
+    # stop=None
+    # )
+
+    # print(response.choices[0].message.content)
 
     
     #check if the csv file exists and if not create it
@@ -107,13 +109,17 @@ def extract_information(pdf_path):
  # ---------- MAIN ---------------------------
 # list all the files in the input folder and extract the information from them
 def main():
-    # files = os.listdir("input")
-    # for file in files:
-    #     pdf_path = os.getcwd() + f"/input/{file}"
-    #     extract_information(pdf_path)
-    pdf_path = os.getcwd() + f"/input/CE2254EVK-a87a3-FR.pdf"
-
-    extract_information(pdf_path)
+    banques = ["BNP", "CA - LCL", "Goldmann", "Natixis", "SG"]
+    for b in banques:
+        i = 0
+        files = os.listdir(f"input/{b}/")
+        if i < 5:
+            for file in files:
+                pdf_path = os.getcwd() + f"/input/{b}/{file}"
+                extract_information(pdf_path)
+                i += 1
+                if i > 5:
+                    break
 
 
 if __name__== '__main__':
