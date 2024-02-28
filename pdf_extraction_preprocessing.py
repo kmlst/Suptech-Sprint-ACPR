@@ -1,3 +1,11 @@
+import sys
+
+def trace_function(frame, event, arg):
+    print(f"Tracing {frame.f_code.co_filename}, event: {event}, line: {frame.f_lineno}")
+    return trace_function
+
+sys.settrace(trace_function)
+
 from typing import Any
 import os
 from unstructured.partition.pdf import partition_pdf
@@ -41,9 +49,10 @@ for element in raw_pdf_elements:
 table_elements = [i.text for i in table_elements]
 text_elements = [i.text for i in text_elements]
 
-# print(text_elements)
-# # Tables
-# print(len(table_elements))
+print("Text elements and table elements")
+print(text_elements)
+print(table_elements)
 
-# # Text
-# print(len(text_elements))
+print("Length of text and table elements")
+print(len(table_elements))
+print(len(text_elements))

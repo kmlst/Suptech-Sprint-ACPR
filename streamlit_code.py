@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # Load data
 @st.cache_data
 def load_data():
-    return pd.read_csv("fake_data.csv")
+    return pd.read_csv("output/bdd_DIC.csv")
 
 import streamlit as st
 import pandas as pd
