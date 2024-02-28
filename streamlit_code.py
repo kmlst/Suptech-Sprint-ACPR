@@ -3,27 +3,49 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import plotly.express as px
+import warnings
+
+warnings.filterwarnings("ignore")
+
+NOM_CHAMP_MECA = '20. Résumé du mécanisme'
+COL_INDEX = "1. le code ISIN du produit"
+NAME_COL = "2. Le nom du produit"
 
 # Load data
 @st.cache_data
 def load_data():
-    return pd.read_csv("output/bdd_DIC.csv")
+    return pd.read_excel("../Exemples + résumés méca.xlsx").set_index(COL_INDEX)
 
 import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def main():
-    st.title("Test Dashboard")
+def new_tab(data):
+    st.title("Bienvenue sur Very'DIC ! .")
+    # Open data record
+    st.sidebar.header("Open Data record")
+    selected_index = st.sidebar.multiselect("Select ISIN", list(data.index))
+    if st.sidebar.button("Open Data Record"):
+        get_record(data, selected_index)
 
-    data = load_data()
+
+def get_record(data, selected_index):
+    st.subheader(f'Résumé pour {selected_index}, {data.loc[selected_index, NAME_COL]}')
+    # with st.expander('Resume'):
+    st.text(data.loc[selected_index, NOM_CHAMP_MECA][0])
+
+
+def dashboard(data):
+    st.title("Synthèse DIC")
 
     # Sidebar for selecting fields
     st.sidebar.header("Select Fields and Apply Filters")
     
     numerical_fields = st.sidebar.multiselect("Select Numerical Fields", data.select_dtypes(include=['float64', 'int64']).columns, key='col_select')
     categorical_fields = st.sidebar.multiselect("Select Categorical Fields", data.select_dtypes(include=['object']).columns, key = 'col_cat_select')
+    # Remove resume that is a special field
+    # categorical_fields.remove(NOM_CHAMP_MECA)
     filter_values = {}
     for field in numerical_fields:
         filter_type = st.sidebar.radio(f"Filter type for {field}", ["Greater than", "Smaller than", "Equal to"])
@@ -65,12 +87,9 @@ def main():
         st.subheader("Filtered Rows IDs")
         st.write(filtered_data.index.tolist())
 
-        
     if numerical_fields or categorical_fields:
         selected_columns = numerical_fields + categorical_fields
-        st.subheader("Selected Columns")
-        st.write(selected_columns)
-        
+       
         st.subheader("Data Visualizations")
 
         # Display plots side by side in two columns
@@ -108,11 +127,43 @@ def main():
             plt.tight_layout()
             # st.pyplot(fig)
 
-    # Open data record
-    st.sidebar.header("Open Data Refiltered_datacord")
-    selected_index = st.sidebar.number_input("Enter row index to view data record", min_value=0, max_value=len(data)-1, step=1)
-    if st.sidebar.button("Open Data Record"):
-        st.write(data.iloc[selected_index])
+
+def switch_to_tab(tab_name):
+    # Update URL query parameters to switch tabs
+    st.query_params["tab"] = tab_name
+
 
 if __name__ == "__main__":
-    main()
+    
+    data = load_data()
+    # Get current tab from URL query parameters
+    # current_tab = st.query_params().get("tab", ["Summary"])[0]
+
+    # Create tabs for navigation
+    # tab1, tab2 = st.tabs(["📈 Summary", "🗃 Data"])
+    # with tab1:
+    #     dashboard(data)
+    # with tab2:
+    #     new_tab(data)
+
+    # Create a layout with two columns for the buttons
+    col1, col2 = st.columns(2)
+
+    # Create buttons to switch tabs
+    with col1:
+        if st.button("Go to Summary"):
+            switch_to_tab("Summary")
+    with col2:
+        if st.button("Go to Data"):
+            switch_to_tab("Data")
+
+    current_tab = st.query_params["tab"]
+
+    # Display content based on current tab
+    if current_tab == "Summary":
+        dashboard(data)
+    elif current_tab == "Data":
+        new_tab(data)
+
+
+
