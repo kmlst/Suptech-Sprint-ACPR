@@ -12,7 +12,7 @@ output_path = os.path.join(os.getcwd(), "images")
 
 raw_pdf_elements = partition_pdf(
     filename=os.path.join(input_path, "CE2254EVK-a87a3-FR.pdf"),
-    extract_images_in_pdf=True,
+    extract_images_in_pdf=False,
     infer_table_structure=True,
     chunking_strategy="by_title",
     max_characters=4000,
@@ -22,8 +22,9 @@ raw_pdf_elements = partition_pdf(
 )
 
 
-# text_elements = []
-# table_elements = []
+text_elements = []
+table_elements = []
+
 # image_elements = []
 
 # # Function to encode images
@@ -31,15 +32,16 @@ raw_pdf_elements = partition_pdf(
 #     with open(image_path, "rb") as image_file:
 #         return base64.b64encode(image_file.read()).decode('utf-8')
 
-# for element in raw_pdf_elements:
-#     if 'CompositeElement' in str(type(element)):
-#         text_elements.append(element)
-#     elif 'Table' in str(type(element)):
-#         table_elements.append(element)
+for element in raw_pdf_elements:
+    if 'CompositeElement' in str(type(element)):
+        text_elements.append(element)
+    elif 'Table' in str(type(element)):
+        table_elements.append(element)
 
-# table_elements = [i.text for i in table_elements]
-# text_elements = [i.text for i in text_elements]
+table_elements = [i.text for i in table_elements]
+text_elements = [i.text for i in text_elements]
 
+# print(text_elements)
 # # Tables
 # print(len(table_elements))
 
