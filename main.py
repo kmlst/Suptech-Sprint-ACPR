@@ -40,14 +40,19 @@ def extract_information(pdf_path):
     model="gpt-35-turbo", 
     messages = message_text,
     temperature=0.,
-    max_tokens=1200,
+    max_tokens=1400,
     top_p=0.,
     frequency_penalty=0,
     presence_penalty=0,
     stop=None
     )
+    try :
+        response_str = response.choices[0].message.content
+    except :
+        print("document corrompu", pdf_path)
+        return None
+    
 
-    response_str = response.choices[0].message.content 
     # response_str is a string containing the JSON response from the API
     # we want to extract the JSON from the string and convert it to a dictionary
     response_str = response_str.replace("```", '') # cleaning
@@ -88,7 +93,7 @@ def extract_information(pdf_path):
     # save the result in the csv file of the output folder
     print(result["code_ISIN"])
     if result["code_ISIN"] in data['code_ISIN'].values:
-        print(f"Le document avec l'ISIN {result['code_ISIN']} déjà été traité")
+        # print(f"Le document avec l'ISIN {result['code_ISIN']} déjà été traité")
         # check the date of the last update : more than 1 month we update the data
         last_update = data[data['code_ISIN'] == result['code_ISIN']]['date_actualisation'].values[0]
         if pd.to_datetime("today") - pd.to_datetime(last_update) > pd.Timedelta(30, unit='D'):
@@ -109,13 +114,14 @@ def extract_information(pdf_path):
  # ---------- MAIN ---------------------------
 # list all the files in the input folder and extract the information from them
 def main():
-    banques = ["BNP", "CA - LCL", "Goldmann", "Natixis", "SG"]
+    banques = ["Goldmann", "BNP", "Natixis", "SG"]
     for b in banques:
-        i = 0
+        i = 1
         files = os.listdir(f"input/{b}/")
         if i < 5:
             for file in files:
                 pdf_path = os.getcwd() + f"/input/{b}/{file}"
+                print(pdf_path)
                 extract_information(pdf_path)
                 i += 1
                 if i > 5:
