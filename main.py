@@ -2,7 +2,7 @@ import fitz
 import os
 import json
 from openai import AzureOpenAI
-from config import prompt_example, columns_to_use
+from config import prompt_example, columns_to_use, prompt_contrequalif
 import pandas as pd
 
 
@@ -55,24 +55,27 @@ def extract_information(pdf_path):
     response_str = response_str.replace('\n', '') # cleaning
 
     result = json.loads(response_str)
+    result["date_actualisation"] = pd.to_datetime("today").strftime("%Y-%m-%d")
 
     # add a counter qualificator of the result that re-reads the result 
     # and the text from the pdf to check if the result is correct
     # if not we mention the number of correctly extracted pieces of information
 
-    # message_text = [{"role":"system","content":prompt_contrequalif},{"role":"user","content":treated_pdf}]
-    # response = client.chat.completions.create(
-    # model="gpt-35-turbo", 
-    # messages = message_text,
-    # temperature=0.,
-    # max_tokens=800,
-    # top_p=0.,
-    # frequency_penalty=0,
-    # presence_penalty=0,
-    # stop=None
-    #)
+    query = f"Here is the json file, {result} \n \n Here is the text from the pdf {treated_pdf}"
+    message_text = [{"role":"system","content":prompt_contrequalif},{"role":"user","content":query}]
+    response = client.chat.completions.create(
+    model="gpt-35-turbo", 
+    messages = message_text,
+    temperature=0.,
+    max_tokens=800,
+    top_p=0.,
+    frequency_penalty=0,
+    presence_penalty=0,
+    stop=None
+    )
 
-    result["date_actualisation"] = pd.to_datetime("today").strftime("%Y-%m-%d")
+    print(response.choices[0].message.content)
+
     
     #check if the csv file exists and if not create it
     if "bdd_DIC.csv" not in os.listdir("output"):
@@ -104,10 +107,14 @@ def extract_information(pdf_path):
  # ---------- MAIN ---------------------------
 # list all the files in the input folder and extract the information from them
 def main():
-    files = os.listdir("input")
-    for file in files:
-        pdf_path = os.getcwd() + f"/input/{file}"
-        extract_information(pdf_path)
+    # files = os.listdir("input")
+    # for file in files:
+    #     pdf_path = os.getcwd() + f"/input/{file}"
+    #     extract_information(pdf_path)
+    pdf_path = os.getcwd() + f"/input/CE2254EVK-a87a3-FR.pdf"
+
+    extract_information(pdf_path)
+
 
 if __name__== '__main__':
     # Run the whole process

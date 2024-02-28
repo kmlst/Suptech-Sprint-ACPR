@@ -135,4 +135,8 @@ Exemple :
 
 (-niveau de barrière désactivante incorrect, -frais accessoires incorrects, 20/22)
 
+(RAS, 22/22)
+
 """
+
+# ajouter au fur et à mesure itérativement les règles et situations de contre-qualification
