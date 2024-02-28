@@ -21,54 +21,24 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-def new_tab(data):
+# @st.cache_data
+def new_tab(data, selected_index):
     st.title("Détail du produit")
     # Open data record
-    st.sidebar.header("Ouvrir le détail")
-    selected_index = st.sidebar.multiselect("Select ISIN", list(data.index))
-    if st.sidebar.button("Ouvrir le détail"):
-        get_record(data, selected_index)
+    get_record(data, selected_index)
 
-
+# @st.cache_data
 def get_record(data, selected_index):
     st.header('Mécanisme du produit')
-    st.subheader(f'Résumé pour {selected_index[0]}, {data.loc[selected_index, NAME_COL].values[0]}')
+    st.subheader(f'Résumé pour {selected_index}, {data.loc[selected_index, NAME_COL]}')
     # with st.expander('Resume'):
-    st.text(data.loc[selected_index, NOM_CHAMP_MECA][0])
+    st.text(data.loc[selected_index, NOM_CHAMP_MECA])
 
 
-def dashboard(data):
-    st.title("Synthèse DIC")
-
-    # Sidebar for selecting fields
-    st.sidebar.header("Select Fields and Apply Filters")
-    
+def apply_filters(data, filter_values):
     numerical_fields = data.select_dtypes(include=['float64', 'int64']).columns
-    categorical_fields = data.select_dtypes(include=['object']).columns
-    all_fields = st.sidebar.multiselect("Champ à explorer", data.columns, key = 'col_cat_select')
-    
-    # Remove resume that is a special field
-    # categorical_fields.remove(NOM_CHAMP_MECA)
-    filter_values = {}
-    for field in all_fields:
-        if field in numerical_fields: # numeric filter
-            filter_type = st.sidebar.radio(f"Filter type for {field}", ["Greater than", "Smaller than", "Equal to"])
-            filter_values[field] = {}
-            if filter_type == "Greater than":
-                filter_values[field]['sign'] = 'Greater than'
-                filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
-            elif filter_type == "Smaller than":
-                filter_values[field]['sign'] = 'Smaller than'
-                filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
-            else:
-                filter_values[field]['sign'] = 'Equal'
-                filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
-
-        else:
-            filter_values[field] = st.sidebar.multiselect(f"Filter {field}", data[field].unique())
-
-    # Apply filters
     filtered_data = data.copy()
+
     for field, value in filter_values.items():
         if value:
             if field in numerical_fields:
@@ -80,6 +50,20 @@ def dashboard(data):
                     filtered_data = filtered_data[filtered_data[field] == value['value']]
             else:
                 filtered_data = filtered_data[filtered_data[field].isin(value)]
+
+    return filtered_data
+
+def dashboard(data):
+    st.title("Synthèse DIC")
+
+    # Sidebar for selecting fields
+    st.sidebar.header("Select Fields and Apply Filters")
+    
+    numerical_fields = data.select_dtypes(include=['float64', 'int64']).columns
+    categorical_fields = data.select_dtypes(include=['object']).columns
+
+    # Apply filters
+    filtered_data = filtered_data = apply_filters(data, filter_values)
 
 
     # Display selected fields
@@ -116,22 +100,6 @@ def dashboard(data):
                             fig.update_xaxes(categoryorder="total descending")
                             cols[j].plotly_chart(fig)
 
-            # Plot numerical fields using Plotly
-            # if numerical_fields:
-            #     for i in range(0, len(numerical_fields), num_cols):
-            #         for j, field in enumerate(numerical_fields[i:i+num_cols]):
-            #             fig = px.histogram(filtered_data, x=field, title=f"{field} Distribution")
-            #             cols[j].plotly_chart(fig)
-
-            # # Plot categorical fields using Plotly
-            # if categorical_fields:
-            #     for i in range(0, len(categorical_fields), num_cols):
-            #         cols = st.columns(num_cols)
-            #         for j, field in enumerate(categorical_fields[i:i+num_cols]):
-            #             fig = px.histogram(filtered_data, x=field, title=f"{field} Count")
-            #             fig.update_xaxes(categoryorder="total descending")
-            #             cols[j].plotly_chart(fig)
-
             # Hide unused axes
             for j in range(num_plots, len(axes)):
                 axes[j].axis('off')
@@ -148,28 +116,52 @@ def switch_to_tab(tab_name):
 if __name__ == "__main__":
     
     data = load_data()
+
     # Get current tab from URL query parameters
-    # current_tab = st.query_params().get("tab", ["Summary"])[0]
+    current_tab = "Summary"
 
     # Create a layout with two columns for the buttons
+    # st.query_params["tab"] = "Summary"    
     col1, col2 = st.columns(2)
-    # switch_to_tab("Summary")
 
     # Create buttons to switch tabs
     with col1:
         if st.button("Tableau de bord"):
-            switch_to_tab("Summary")
+            current_tab = "Summary"
+            # switch_to_tab("Summary")
     with col2:
         if st.button("Détail produit"):
-            switch_to_tab("Data")
+            current_tab = "Data"
 
-    current_tab = st.query_params["tab"]
+    # Sidebar for selecting fields and applying filters
+    st.sidebar.header("Select Fields and Apply Filters")
+    numerical_fields = data.select_dtypes(include=['float64', 'int64']).columns
+    categorical_fields = data.select_dtypes(include=['object']).columns
+    all_fields = st.sidebar.multiselect("Champ à explorer", data.columns, key='col_cat_select')
+    filter_values = {}
+    for field in all_fields:
+        if field in numerical_fields:
+            filter_type = st.sidebar.radio(f"Filter type for {field}", ["Greater than", "Smaller than", "Equal to"])
+            filter_values[field] = {}
+            if filter_type == "Greater than":
+                filter_values[field]['sign'] = 'Greater than'
+                filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
+            elif filter_type == "Smaller than":
+                filter_values[field]['sign'] = 'Smaller than'
+                filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
+            else:
+                filter_values[field]['sign'] = 'Equal'
+                filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
+        else:
+            filter_values[field] = st.sidebar.multiselect(f"Filter {field}", data[field].unique())
 
-    # Display content based on current tab
-    if current_tab == "Summary":
+    selected_isin = st.sidebar.selectbox("Select ISIN", list(data.index))
+
+    if st.sidebar.button("Ouvrir le détail"):
+        new_tab(data, selected_isin)
+    else:
+        # dashboard(data)
         dashboard(data)
-    elif current_tab == "Data":
-        new_tab(data)
 
 
 
