@@ -30,7 +30,7 @@ def extract_information(pdf_path):
     ## Appel api
     client = AzureOpenAI(
     azure_endpoint = "https://francecentral-openai.openai.azure.com/", 
-    api_key="7e93421f46cd4680831023addcb0f42d",  # clef d'api sous forme plus safe...
+    api_key="7e93421f46cd4680831023addcb0f42d",  
     api_version="2024-02-15-preview"
     )
 
@@ -136,10 +136,8 @@ def extract_information(pdf_path):
     if result["code_ISIN"] in data['code_ISIN'].values:
         print(f"Le document avec l'ISIN {result['code_ISIN']} déjà été traité")
     else:
-        # result is a dictionary containing the extracted information
         # Add the result to the DataFrame without using append
         data = data.append(result, ignore_index=True)
-
         # save the result in the csv file of the output folders
         data.to_csv("output/bdd_DIC.csv", index=False)
 
@@ -150,7 +148,6 @@ def extract_information(pdf_path):
 
 print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 print("EXEMPLES INCOMPLETS DANS LES DOSSIERS : 20 features seulement, il faut corriger les json mis en examples")
-print("Rajouter un champs pour la date d'actualisation de traitement du document")
 print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
 
 
