@@ -7,7 +7,7 @@ import plotly.express as px
 # Load data
 @st.cache_data
 def load_data():
-    return pd.read_csv("../fake_data.csv")
+    return pd.read_csv("fake_data.csv")
 
 import streamlit as st
 import pandas as pd
@@ -26,12 +26,17 @@ def main():
     filter_values = {}
     for field in numerical_fields:
         filter_type = st.sidebar.radio(f"Filter type for {field}", ["Greater than", "Smaller than", "Equal to"])
+        filter_values[field] = {}
         if filter_type == "Greater than":
-            filter_values[field] = st.sidebar.number_input(f"Filter {field}", step=0.1)
+            filter_values[field]['sign'] = 'Greater than'
+            filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
         elif filter_type == "Smaller than":
-            filter_values[field] = st.sidebar.number_input(f"Filter {field}", step=0.1)
+            filter_values[field]['sign'] = 'Smaller than'
+            filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
         else:
-            filter_values[field] = st.sidebar.number_input(f"Filter {field}", step=0.1)
+            filter_values[field]['sign'] = 'Equal'
+            filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
+
     for field in categorical_fields:
         filter_values[field] = st.sidebar.multiselect(f"Filter {field}", data[field].unique(), key='categories')
 
@@ -40,12 +45,12 @@ def main():
     for field, value in filter_values.items():
         if value:
             if field in numerical_fields:
-                if "Greater than" in filter_values[field]:
-                    filtered_data = filtered_data[filtered_data[field] > value]
-                elif "Smaller than" in filter_values[field]:
-                    filtered_data = filtered_data[filtered_data[field] < value]
+                if "Greater than" in filter_values[field]['sign']:
+                    filtered_data = filtered_data[filtered_data[field] > value['value']]
+                elif "Smaller than" in filter_values[field]['sign']:
+                    filtered_data = filtered_data[filtered_data[field] < value['value']]
                 else:
-                    filtered_data = filtered_data[filtered_data[field] == value]
+                    filtered_data = filtered_data[filtered_data[field] == value['value']]
             else:
                 filtered_data = filtered_data[filtered_data[field].isin(value)]
 
@@ -73,7 +78,7 @@ def main():
             for i in range(0, len(numerical_fields), num_cols):
                 cols = st.columns(num_cols)
                 for j, field in enumerate(numerical_fields[i:i+num_cols]):
-                    fig = px.histogram(data, x=field, title=f"{field} Distribution")
+                    fig = px.histogram(filtered_data, x=field, title=f"{field} Distribution")
                     cols[j].plotly_chart(fig)
 
         # Plot categorical fields using Plotly
@@ -82,7 +87,7 @@ def main():
             for i in range(0, len(categorical_fields), num_cols):
                 cols = st.columns(num_cols)
                 for j, field in enumerate(categorical_fields[i:i+num_cols]):
-                    fig = px.histogram(data, x=field, title=f"{field} Count")
+                    fig = px.histogram(filtered_data, x=field, title=f"{field} Count")
                     fig.update_xaxes(categoryorder="total descending")
                     cols[j].plotly_chart(fig)
 
@@ -93,8 +98,19 @@ def main():
             plt.tight_layout()
             # st.pyplot(fig)
 
+
+    # Display IDs of filtered rows
+    if len(filtered_data) < len(data):
+        st.subheader("Filtered Rows IDs")
+        st.write(filtered_data.index.tolist())
+
+
+    # Download filtered CSV
+    csv = filtered_data.to_csv(index=False)
+    st.download_button(label="Download filtered data CSV file", data=csv, file_name="filtered_data.csv", mime="text/csv")
+
     # Open data record
-    st.sidebar.header("Open Data Record")
+    st.sidebar.header("Open Data Refiltered_datacord")
     selected_index = st.sidebar.number_input("Enter row index to view data record", min_value=0, max_value=len(data)-1, step=1)
     if st.sidebar.button("Open Data Record"):
         st.write(data.iloc[selected_index])
