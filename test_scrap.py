@@ -126,10 +126,8 @@ def extract_information(pdf_path):
     if result["code_ISIN"] in data['code_ISIN'].values:
         print(f"Le document avec l'ISIN {result['code_ISIN']} déjà été traité")
     else:
-        # result is a dictionary containing the extracted information
         # Add the result to the DataFrame without using append
         data = data.append(result, ignore_index=True)
-
         # save the result in the csv file of the output folders
         data.to_csv("output/bdd_DIC.csv", index=False)
 
@@ -140,7 +138,6 @@ def extract_information(pdf_path):
 
 print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 print("EXEMPLES INCOMPLETS DANS LES DOSSIERS : 20 features seulement, il faut corriger les json mis en examples")
-print("Rajouter un champs pour la date d'actualisation de traitement du document")
 print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
 
 
