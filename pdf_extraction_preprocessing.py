@@ -1,9 +1,10 @@
 from typing import Any
 import os
 from unstructured.partition.pdf import partition_pdf
+import pytesseract
 import base64
 
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+pytesseract.pytesseract.tesseract_cmd = r'/user/local/bin/tesseract'
 
 
 input_path = os.getcwd() + "/input"
