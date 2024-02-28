@@ -2,7 +2,7 @@ import fitz
 import os
 import json
 from openai import AzureOpenAI
-from config import prompt_example
+from config import prompt_example, columns_to_use
 import pandas as pd
 
 
@@ -113,12 +113,12 @@ def extract_information(pdf_path):
     # ]
 
     # meanwhile we will use the following columns
-    columns = ["code_ISIN", "nom_du_produit", "emetteur_du_produit", "date_emission", "date_remboursement", "mention_complexite", "montant_minimum_investissement", "niveau_garantie", "niveau_barriere_desactivante", "niveau_risque", "produit_sous_jacent", "nature_sous_jacent", "code_ISIN_sous_jacent", "frais_ponctuels_entree", "frais_ponctuels_sortie", "frais_recurrents", "frais_accessoires", "performance_tension", "performance_maximale", "espérance_maximale_rendement", "date_actualisation"]
+
 
 
     #check if the csv file exists and if not create it
     if os.listdir("output") == []:
-            data = pd.DataFrame(columns=columns)
+            data = pd.DataFrame(columns=columns_to_use)
     else:
         data = pd.read_csv("output/bdd_DIC.csv")
         
