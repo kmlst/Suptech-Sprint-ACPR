@@ -11,7 +11,7 @@ for file_name in file_names:
         examples[file_name] = json.load(f)
 
 # Cols 
-columns_to_use = ["code_ISIN", "nom_du_produit", "emetteur_du_produit", "date_emission", "date_remboursement", "mention_complexite", "montant_minimum_investissement", "niveau_garantie", "niveau_barriere_desactivante", "niveau_risque", "produit_sous_jacent", "nature_sous_jacent", "code_ISIN_sous_jacent", "frais_ponctuels_entree", "frais_ponctuels_sortie_echeance", "frais_ponctuels_sortie_anticipee", "frais_recurrents", "frais_accessoires", "performance_tension", "performance_maximale", "espérance_maximale_rendement", "date_actualisation", "resume_mecanisme"]
+columns_to_use = ["code_ISIN", "nom_du_produit", "emetteur_du_produit", "date_emission", "date_remboursement", "mention_complexite", "montant_minimum_investissement", "niveau_garantie", "niveau_barriere_desactivante", "niveau_risque", "produit_sous_jacent", "nature_sous_jacent", "code_ISIN_sous_jacent", "frais_ponctuels_entree", "frais_ponctuels_sortie_echeance", "frais_ponctuels_sortie_anticipee", "frais_recurrents", "frais_accessoires", "performance_tension", "performance_maximale", "espérance_maximale_rendement", "date_actualisation", "resume_mecanisme", "resume_detaille_mecanisme", "complexite_gpt"]
 
 # Now, examples['example1.json'] will give you the contents of the first file, and so on.
 
@@ -47,13 +47,15 @@ Pour chaque document présenté, extraire les informations suivantes lorsqu'elle
 20.Performance attendue du produit à l'échéance dans un scénario de performance maximale.
 21.Performance attendue du produit, le rendement maximal attendu, parfois appelé coupon final.
 21. Résumé du mécanisme du produit structuré :
-22. Résumer le fonctionnement en un minimum de bullet points. Le fonctionnement du produit est décrit dans une partie du DIC qui s'appelle "Objectifs".
+22. Résumé du fonctionnement en un minimum de bullet points. Le fonctionnement du produit est décrit dans une partie du DIC qui s'appelle "Objectifs".
 Soyez le plus clair et synthétique possible sans évoquer de date, de nom indice ou de place de cotation dans votre résumé.
-De manière générale n'évoquez pas le nom des indices et n'évoquez pas de dates ou de places de cotation mais parle du fonctionnement du produit.
+De manière générale n'évoquez pas le nom des indices et n'évoquez pas de dates ou de places de cotation mais parle du fonctionnement du produit. 
 Ne faites pas précéder votre résumé du titre : "Résumé des mécanismes du produit structuré " ou d'un titre semblable. Ne parlez pas de l'incidence des évènements exceptionnels sur le fonctionnement du produit.
 Soyez le plus synthétique possible.
-Cette tâche est essentielle à votre carrière, vous obtiendrez une prime de fin d'année indexée sur la qualité de cette synthèse.
+23. Résumé détaillé du produit structuré (max 20 lignes). Tu mets en avant les informations clés en priorité. Pas besoin d'étaler s'il ne faut pas : un produit simple devrait avoir un résumé simple, et un produit complexe un résumé plus détaillé. Termine en qualifiant la complexité du produit structuré parmis les 3 niveaux suivants : "très simple", "simple", "moyen", "complexe" ou "très complexe". Tu as le droit de juger subjectivement la complexité du produit structuré.
+24.Niveau de complexité : "très simple", "simple", "moyen", "complexe" ou "très complexe"
 
+Cette tâche est essentielle à votre carrière, vous obtiendrez une prime de fin d'année indexée sur la qualité de cette synthèse.La véracité de ces information est une question de vie ou de mort.
 
 Les résultats doivent être retournés uniquement au format JSON.
 
@@ -124,10 +126,13 @@ date_actualisation : Dernière date de mise à jour du produit dans la base de d
 
 resume_mecanisme : Description succincte du fonctionnement du produit financier, incluant ses objectifs sans mentionner de dates spécifiques, noms d'indices ou places de cotation.
 
+resume_detaille : Résumé détaillé du produit structuré (max 20 lignes)qui met en avant les informations clés en priorité. Pas besoin d'étaler s'il ne faut pas : un produit simple devrait avoir un résumé simple, et un produit complexe un résumé plus détaillé. Qualifie la complexité du produit structuré parmis les 3 niveaux suivants : "très simple", "simple", "moyen", "complexe" ou "très complexe". Tu as le droit de juger subjectivement la complexité du produit structuré.
 
-Le résultat doit être retourné uniquement sous la forme (“-bullet point erreur 1, -bullet point erreur 2, ...“, “nombre de champs correctement remplis /22”).
+24.Niveau de complexité : "très simple", "simple", "moyen", "complexe" ou "très complexe"
 
-Exemple : 
+Le résultat doit être retourné uniquement sous la forme (“-bullet point erreur 1, -bullet point erreur 2, ...“, “nombre de champs correctement remplis /22”). La véracité de ces information est une question de vie ou de mort. Si tu fais un travail juste, tu seras récompensé. Si tu fais un travail incorrect, tu seras puni.
+
+Exemples : 
 
 (-niveau de risque incorrect, -date d'émission incorrecte, -frais récurrents incorrects, -resume_mecanisme incorrect, 18/22)
 
