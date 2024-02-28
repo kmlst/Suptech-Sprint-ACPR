@@ -1,16 +1,10 @@
 import sys
-
-def trace_function(frame, event, arg):
-    print(f"Tracing {frame.f_code.co_filename}, event: {event}, line: {frame.f_lineno}")
-    return trace_function
-
-sys.settrace(trace_function)
-
 from typing import Any
 import os
 from unstructured.partition.pdf import partition_pdf
 import pytesseract
 import base64
+
 
 pytesseract.pytesseract.tesseract_cmd = r'/user/local/bin/tesseract'
 
