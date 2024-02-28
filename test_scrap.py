@@ -29,7 +29,7 @@ def extract_information(pdf_path):
     ## Appel api
     client = AzureOpenAI(
     azure_endpoint = "https://francecentral-openai.openai.azure.com/", 
-    api_key="7e93421f46cd4680831023addcb0f42d",  # clef d'api sous forme plus safe...
+    api_key="7e93421f46cd4680831023addcb0f42d",  
     api_version="2024-02-15-preview"
     )
 
@@ -113,7 +113,7 @@ def extract_information(pdf_path):
     # ]
 
     # meanwhile we will use the following columns
-    columns = ["code_ISIN", "nom_du_produit", "emetteur_du_produit", "date_emission", "date_remboursement", "mention_complexite", "montant_minimum_investissement", "niveau_garantie", "niveau_barriere_desactivante", "niveau_risque", "produit_sous_jacent", "nature_sous_jacent", "code_ISIN_sous_jacent", "frais_ponctuels_entree", "frais_ponctuels_sortie", "frais_recurrents", "frais_accessoires", "performance_tension", "performance_maximale", "espérance_maximale_rendement"]
+    columns = ["code_ISIN", "nom_du_produit", "emetteur_du_produit", "date_emission", "date_remboursement", "mention_complexite", "montant_minimum_investissement", "niveau_garantie", "niveau_barriere_desactivante", "niveau_risque", "produit_sous_jacent", "nature_sous_jacent", "code_ISIN_sous_jacent", "frais_ponctuels_entree", "frais_ponctuels_sortie", "frais_recurrents", "frais_accessoires", "performance_tension", "performance_maximale", "espérance_maximale_rendement", "date_actualisation"]
 
 
     #check if the csv file exists and if not create it
