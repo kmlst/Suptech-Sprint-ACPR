@@ -40,7 +40,7 @@ def extract_information(pdf_path):
     model="gpt-35-turbo", 
     messages = message_text,
     temperature=0.,
-    max_tokens=400,
+    max_tokens=800,
     top_p=0.,
     frequency_penalty=0,
     presence_penalty=0,
@@ -55,30 +55,51 @@ def extract_information(pdf_path):
     response_str = response_str.replace('\n', '') # cleaning
 
     result = json.loads(response_str)
-    
-    result = pd.DataFrame(result, index=[0])
-    result["date_actualisation"] = pd.to_datetime("today").strftime("%Y-%m-%d")
 
+    # add a counter qualificator of the result that re-reads the result 
+    # and the text from the pdf to check if the result is correct
+    # if not we mention the number of correctly extracted pieces of information
+
+    # message_text = [{"role":"system","content":prompt_contrequalif},{"role":"user","content":treated_pdf}]
+    # response = client.chat.completions.create(
+    # model="gpt-35-turbo", 
+    # messages = message_text,
+    # temperature=0.,
+    # max_tokens=800,
+    # top_p=0.,
+    # frequency_penalty=0,
+    # presence_penalty=0,
+    # stop=None
+    #)
+
+    result["date_actualisation"] = pd.to_datetime("today").strftime("%Y-%m-%d")
+    
     #check if the csv file exists and if not create it
-    if os.listdir("output") == []:
+    if "bdd_DIC.csv" not in os.listdir("output"):
             data = pd.DataFrame(columns=columns_to_use)
     else:
         data = pd.read_csv("output/bdd_DIC.csv")
         
     # save the result in the csv file of the output folder
+    print(result["code_ISIN"])
     if result["code_ISIN"] in data['code_ISIN'].values:
         print(f"Le document avec l'ISIN {result['code_ISIN']} déjà été traité")
+        # check the date of the last update : more than 1 month we update the data
+        last_update = data[data['code_ISIN'] == result['code_ISIN']]['date_actualisation'].values[0]
+        if pd.to_datetime("today") - pd.to_datetime(last_update) > pd.Timedelta(30, unit='D'):
+            print(f"Le document avec l'ISIN {result['code_ISIN']} n'a pas été actualisé depuis plus d'un mois, nous mettons à jour les données")
+            data = data[data['code_ISIN'] != result['code_ISIN']]
+            data = pd.concat([data, pd.DataFrame([result])], ignore_index=True, axis=0)
+            data.to_csv("output/bdd_DIC.csv", index=False)
+
     else:
         # Add the result to the DataFrame without using append
-        data = data.append(result, ignore_index=True)
+        data = pd.concat([data, pd.DataFrame([result])], ignore_index=True, axis=0)
         # save the result in the csv file of the output folders
         data.to_csv("output/bdd_DIC.csv", index=False)
 
-# now we want to read all the pdf files in the input folder and extract the information from them
+    
 
-print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-print("EXEMPLES INCOMPLETS DANS LES DOSSIERS : 20 features seulement, il faut corriger les json mis en examples")
-print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
 
  # ---------- MAIN ---------------------------
 # list all the files in the input folder and extract the information from them
