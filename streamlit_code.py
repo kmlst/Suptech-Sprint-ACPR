@@ -22,16 +22,17 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 def new_tab(data):
-    st.title("Bienvenue sur Very'DIC ! .")
+    st.title("Détail du produit")
     # Open data record
-    st.sidebar.header("Open Data record")
+    st.sidebar.header("Ouvrir le détail")
     selected_index = st.sidebar.multiselect("Select ISIN", list(data.index))
-    if st.sidebar.button("Open Data Record"):
+    if st.sidebar.button("Ouvrir le détail"):
         get_record(data, selected_index)
 
 
 def get_record(data, selected_index):
-    st.subheader(f'Résumé pour {selected_index}, {data.loc[selected_index, NAME_COL]}')
+    st.header('Mécanisme du produit')
+    st.subheader(f'Résumé pour {selected_index[0]}, {data.loc[selected_index, NAME_COL].values[0]}')
     # with st.expander('Resume'):
     st.text(data.loc[selected_index, NOM_CHAMP_MECA][0])
 
@@ -42,26 +43,29 @@ def dashboard(data):
     # Sidebar for selecting fields
     st.sidebar.header("Select Fields and Apply Filters")
     
-    numerical_fields = st.sidebar.multiselect("Select Numerical Fields", data.select_dtypes(include=['float64', 'int64']).columns, key='col_select')
-    categorical_fields = st.sidebar.multiselect("Select Categorical Fields", data.select_dtypes(include=['object']).columns, key = 'col_cat_select')
+    numerical_fields = data.select_dtypes(include=['float64', 'int64']).columns
+    categorical_fields = data.select_dtypes(include=['object']).columns
+    all_fields = st.sidebar.multiselect("Champ à explorer", data.columns, key = 'col_cat_select')
+    
     # Remove resume that is a special field
     # categorical_fields.remove(NOM_CHAMP_MECA)
     filter_values = {}
-    for field in numerical_fields:
-        filter_type = st.sidebar.radio(f"Filter type for {field}", ["Greater than", "Smaller than", "Equal to"])
-        filter_values[field] = {}
-        if filter_type == "Greater than":
-            filter_values[field]['sign'] = 'Greater than'
-            filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
-        elif filter_type == "Smaller than":
-            filter_values[field]['sign'] = 'Smaller than'
-            filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
-        else:
-            filter_values[field]['sign'] = 'Equal'
-            filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
+    for field in all_fields:
+        if field in numerical_fields: # numeric filter
+            filter_type = st.sidebar.radio(f"Filter type for {field}", ["Greater than", "Smaller than", "Equal to"])
+            filter_values[field] = {}
+            if filter_type == "Greater than":
+                filter_values[field]['sign'] = 'Greater than'
+                filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
+            elif filter_type == "Smaller than":
+                filter_values[field]['sign'] = 'Smaller than'
+                filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
+            else:
+                filter_values[field]['sign'] = 'Equal'
+                filter_values[field]['value'] = st.sidebar.number_input(f"Filter {field}", step=0.1)
 
-    for field in categorical_fields:
-        filter_values[field] = st.sidebar.multiselect(f"Filter {field}", data[field].unique(), key='categories')
+        else:
+            filter_values[field] = st.sidebar.multiselect(f"Filter {field}", data[field].unique())
 
     # Apply filters
     filtered_data = data.copy()
@@ -83,42 +87,50 @@ def dashboard(data):
     csv = filtered_data.to_csv(index=False)
     st.download_button(label="Download filtered data CSV file", data=csv, file_name="filtered_data.csv", mime="text/csv")
     # Display IDs of filtered rows
-    if len(filtered_data) < len(data):
-        st.subheader("Filtered Rows IDs")
-        st.write(filtered_data.index.tolist())
+    # if len(filtered_data) < len(data):
+    #     st.subheader("Filtered Rows IDs")
+    #     st.write(filtered_data.index.tolist())
 
-    if numerical_fields or categorical_fields:
-        selected_columns = numerical_fields + categorical_fields
+    if all_fields:
+        # selected_columns = numerical_fields + categorical_fields
        
         st.subheader("Data Visualizations")
 
         # Display plots side by side in two columns
-        num_plots = len(numerical_fields) + len(categorical_fields)
+        num_plots = len(all_fields)
         num_cols = 2
         num_rows = -(-num_plots // num_cols)  # Ceiling division to calculate number of rows needed
 
         with st.container():
             fig, axes = plt.subplots(num_rows, num_cols, figsize=(12, 8))
             axes = axes.flatten()
+            # num_cols = 2
+            for i in range(0, len(all_fields), num_cols):
+                cols = st.columns(num_cols)
+                for j, field in enumerate(all_fields[i:i+num_cols]):
+                        if field in numerical_fields:
+                            fig = px.histogram(filtered_data, x=field, title=f"{field} Distribution")
+                            cols[j].plotly_chart(fig)
+                        else:
+                            fig = px.histogram(filtered_data, x=field, title=f"{field}")
+                            fig.update_xaxes(categoryorder="total descending")
+                            cols[j].plotly_chart(fig)
 
             # Plot numerical fields using Plotly
-        if numerical_fields:
-            num_cols = 2
-            for i in range(0, len(numerical_fields), num_cols):
-                cols = st.columns(num_cols)
-                for j, field in enumerate(numerical_fields[i:i+num_cols]):
-                    fig = px.histogram(filtered_data, x=field, title=f"{field} Distribution")
-                    cols[j].plotly_chart(fig)
+            # if numerical_fields:
+            #     for i in range(0, len(numerical_fields), num_cols):
+            #         for j, field in enumerate(numerical_fields[i:i+num_cols]):
+            #             fig = px.histogram(filtered_data, x=field, title=f"{field} Distribution")
+            #             cols[j].plotly_chart(fig)
 
-        # Plot categorical fields using Plotly
-        if categorical_fields:
-            num_cols = 2
-            for i in range(0, len(categorical_fields), num_cols):
-                cols = st.columns(num_cols)
-                for j, field in enumerate(categorical_fields[i:i+num_cols]):
-                    fig = px.histogram(filtered_data, x=field, title=f"{field} Count")
-                    fig.update_xaxes(categoryorder="total descending")
-                    cols[j].plotly_chart(fig)
+            # # Plot categorical fields using Plotly
+            # if categorical_fields:
+            #     for i in range(0, len(categorical_fields), num_cols):
+            #         cols = st.columns(num_cols)
+            #         for j, field in enumerate(categorical_fields[i:i+num_cols]):
+            #             fig = px.histogram(filtered_data, x=field, title=f"{field} Count")
+            #             fig.update_xaxes(categoryorder="total descending")
+            #             cols[j].plotly_chart(fig)
 
             # Hide unused axes
             for j in range(num_plots, len(axes)):
@@ -139,22 +151,16 @@ if __name__ == "__main__":
     # Get current tab from URL query parameters
     # current_tab = st.query_params().get("tab", ["Summary"])[0]
 
-    # Create tabs for navigation
-    # tab1, tab2 = st.tabs(["📈 Summary", "🗃 Data"])
-    # with tab1:
-    #     dashboard(data)
-    # with tab2:
-    #     new_tab(data)
-
     # Create a layout with two columns for the buttons
     col1, col2 = st.columns(2)
+    # switch_to_tab("Summary")
 
     # Create buttons to switch tabs
     with col1:
-        if st.button("Go to Summary"):
+        if st.button("Tableau de bord"):
             switch_to_tab("Summary")
     with col2:
-        if st.button("Go to Data"):
+        if st.button("Détail produit"):
             switch_to_tab("Data")
 
     current_tab = st.query_params["tab"]
