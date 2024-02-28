@@ -1,10 +1,9 @@
 import fitz 
 import os
+import json
 from openai import AzureOpenAI
 from config import prompt_example
 import pandas as pd
-
-os.getcwd()
 
 
 def read_pdf(pdf_path):
@@ -40,7 +39,7 @@ def extract_information(pdf_path):
     model="gpt-35-turbo", 
     messages = message_text,
     temperature=0.,
-    max_tokens=800,
+    max_tokens=400,
     top_p=0.,
     frequency_penalty=0,
     presence_penalty=0,
@@ -75,22 +74,13 @@ def extract_information(pdf_path):
 
     # response_str is a string containing the JSON response from the API
     # we want to extract the JSON from the string and convert it to a dictionary
-    response_str = response_str[8:-3]
-    response_str = response_str.replace('{', '')
-    response_str = response_str.replace('}', '')
-    response_str = response_str.replace('\n', '')
-    response_str = response_str.replace('\n ', '')
-    response_str = response_str.replace(' \n', '')
-    response_str = response_str.replace('  ', '')
-    result = {}
-    response_str = response_str.split(',')
-    for text in response_str:
-        ligne = text.split(": ")
-        ligne = [i.strip() for i in ligne]
-        print(ligne)
-        key, value = ligne[0].replace('"', ''), ligne[1].replace('"', '')
-        result[key] = value
-    result = pd.dataframe(result, index=[0])
+    response_str = response_str.replace("```", '') # cleaning
+    response_str = response_str.replace('json', '') # cleaning
+    response_str = response_str.replace('\n', '') # cleaning
+
+    result = json.loads(response_str)
+    
+    result = pd.DataFrame(result, index=[0])
     result["date_actualisation"] = pd.to_datetime("today").strftime("%Y-%m-%d")
 
     #view the result
@@ -157,4 +147,5 @@ files = os.listdir("input")
 for file in files:
     pdf_path = os.getcwd() + f"/input/{file}"
     extract_information(pdf_path)
+
 
