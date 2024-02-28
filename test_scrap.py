@@ -2,10 +2,11 @@ import fitz
 import os
 import json
 from openai import AzureOpenAI
-from config import prompt_example
+from config import prompt_example, columns_to_use
 import pandas as pd
 
 
+# va partir -----------------
 def read_pdf(pdf_path):
     # Open the provided PDF file
     doc = fitz.open(pdf_path)
@@ -47,31 +48,6 @@ def extract_information(pdf_path):
     )
 
     response_str = response.choices[0].message.content 
-    # output example 
-
-    # {
-    #   "code_ISIN": "XS2442385998",
-    #   "nom_du_produit": "Calliandra Mai 2028",
-    #   "emetteur_du_produit": "BNP Paribas Issuance B.V.",
-    #   "date_emission": "2023-03-08",
-    #   "date_remboursement": "2028-06-01",
-    #   "mention_complexite": true,
-    #   "montant_minimum_investissement": "Non spécifié",
-    #   "niveau_garantie": 1,
-    #   "niveau_barriere_desactivante": 100,
-    #   "niveau_risque": 2,
-    #   "produit_sous_jacent": "Indice EURO STOXX 50",
-    #   "nature_sous_jacent": "indice",
-    #   "code_ISIN_sous_jacent": "Non applicable",
-    #   "frais_ponctuels_entree": "3.96%",
-    #   "frais_ponctuels_sortie": "0.5% du montant nominal",
-    #   "frais_recurrents": "0% de votre investissement par an",
-    #   "frais_accessoires": "Aucune commission liée aux résultats n'existe pour ce produit",
-    #   "performance_tension": "-13.01%",
-    #   "performance_maximale": "4.67%",
-    #   "espérance_maximale_rendement": "Non spécifié"
-    # }
-
     # response_str is a string containing the JSON response from the API
     # we want to extract the JSON from the string and convert it to a dictionary
     response_str = response_str.replace("```", '') # cleaning
@@ -83,42 +59,9 @@ def extract_information(pdf_path):
     result = pd.DataFrame(result, index=[0])
     result["date_actualisation"] = pd.to_datetime("today").strftime("%Y-%m-%d")
 
-    #view the result
-    # for i in result.keys():
-    #     print(i, ":", result[i])
-
-    # final version of the columns
-    # true_columns = [
-    #     "code_ISIN",
-    #     "nom_du_produit",
-    #     "emetteur_du_produit",
-    #     "date_emission",
-    #     "date_remboursement",
-    #     "mention_complexite",
-    #     "montant_minimum_investissement",
-    #     "niveau_garantie",
-    #     "niveau_barriere_desactivante",
-    #     "niveau_risque",
-    #     "produit_sous_jacent",
-    #     "nature_sous_jacent",
-    #     "code_ISIN_sous_jacent",
-    #     "frais_ponctuels_entree",
-    #     "frais_ponctuels_sortie_echeance",
-    #     "frais_ponctuels_sortie_anticipee",
-    #     "frais_recurrents",
-    #     "frais_accessoires",
-    #     "performance_tension",
-    #     "performance_maximale",
-    #     "espérance_maximale_rendement"
-    # ]
-
-    # meanwhile we will use the following columns
-    columns = ["code_ISIN", "nom_du_produit", "emetteur_du_produit", "date_emission", "date_remboursement", "mention_complexite", "montant_minimum_investissement", "niveau_garantie", "niveau_barriere_desactivante", "niveau_risque", "produit_sous_jacent", "nature_sous_jacent", "code_ISIN_sous_jacent", "frais_ponctuels_entree", "frais_ponctuels_sortie", "frais_recurrents", "frais_accessoires", "performance_tension", "performance_maximale", "espérance_maximale_rendement", "date_actualisation"]
-
-
     #check if the csv file exists and if not create it
     if os.listdir("output") == []:
-            data = pd.DataFrame(columns=columns)
+            data = pd.DataFrame(columns=columns_to_use)
     else:
         data = pd.read_csv("output/bdd_DIC.csv")
         
@@ -131,21 +74,21 @@ def extract_information(pdf_path):
         # save the result in the csv file of the output folders
         data.to_csv("output/bdd_DIC.csv", index=False)
 
-
-
 # now we want to read all the pdf files in the input folder and extract the information from them
-
 
 print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 print("EXEMPLES INCOMPLETS DANS LES DOSSIERS : 20 features seulement, il faut corriger les json mis en examples")
 print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n")
 
-
-
+ # ---------- MAIN ---------------------------
 # list all the files in the input folder and extract the information from them
-files = os.listdir("input")
-for file in files:
-    pdf_path = os.getcwd() + f"/input/{file}"
-    extract_information(pdf_path)
+def main():
+    files = os.listdir("input")
+    for file in files:
+        pdf_path = os.getcwd() + f"/input/{file}"
+        extract_information(pdf_path)
 
+if __name__== '__main__':
+    # Run the whole process
+    main()
 
