@@ -10,6 +10,9 @@ for file_name in file_names:
     with open(file_name) as f:
         examples[file_name] = json.load(f)
 
+# Cols 
+columns_to_use = ["code_ISIN", "nom_du_produit", "emetteur_du_produit", "date_emission", "date_remboursement", "mention_complexite", "montant_minimum_investissement", "niveau_garantie", "niveau_barriere_desactivante", "niveau_risque", "produit_sous_jacent", "nature_sous_jacent", "code_ISIN_sous_jacent", "frais_ponctuels_entree", "frais_ponctuels_sortie", "frais_recurrents", "frais_accessoires", "performance_tension", "performance_maximale", "espérance_maximale_rendement", "date_actualisation"]
+
 # Now, examples['example1.json'] will give you the contents of the first file, and so on.
 
 prompt_example = f"""
@@ -43,6 +46,14 @@ Pour chaque document présenté, extraire les informations suivantes lorsqu'elle
 19.Performance attendue du produit à l'échéance dans un scénario de stress.
 20.Performance attendue du produit à l'échéance dans un scénario de performance maximale.
 21.Performance attendue du produit, le rendement maximal attendu, parfois appelé coupon final.
+21. Résumé du mécanisme du produit structuré :
+22. Résumer le fonctionnement en un minimum de bullet points. Le fonctionnement du produit est décrit dans une partie du DIC qui s'appelle "Objectifs".
+Soyez le plus clair et synthétique possible sans évoquer de date, de nom indice ou de place de cotation dans votre résumé.
+De manière générale n'évoquez pas le nom des indices et n'évoquez pas de dates ou de places de cotation mais parle du fonctionnement du produit.
+Ne faites pas précéder votre résumé du titre : "Résumé des mécanismes du produit structuré " ou d'un titre semblable. Ne parlez pas de l'incidence des évènements exceptionnels sur le fonctionnement du produit.
+Soyez le plus synthétique possible.
+Cette tâche est essentielle à votre carrière, vous obtiendrez une prime de fin d'année indexée sur la qualité de cette synthèse.
+
 
 Les résultats doivent être retournés uniquement au format JSON.
 
