@@ -27,7 +27,7 @@ def extract_information(pdf_path):
     # Call the function and print the result
     treated_pdf = read_pdf(pdf_path)
 
-    ## Appel api
+    # Appel api
     client = AzureOpenAI(
     azure_endpoint = "https://francecentral-openai.openai.azure.com/", 
     api_key="7e93421f46cd4680831023addcb0f42d",  
@@ -46,13 +46,8 @@ def extract_information(pdf_path):
     presence_penalty=0,
     stop=None
     )
-    try :
-        response_str = response.choices[0].message.content
-    except :
-        print("document corrompu", pdf_path)
-        return None
-    
 
+    response_str = response.choices[0].message.content
     # response_str is a string containing the JSON response from the API
     # we want to extract the JSON from the string and convert it to a dictionary
     response_str = response_str.replace("```", '') # cleaning

@@ -57,7 +57,7 @@ Soyez le plus synthétique possible.
 
 Cette tâche est essentielle à votre carrière, vous obtiendrez une prime de fin d'année indexée sur la qualité de cette synthèse.La véracité de ces information est une question de vie ou de mort.
 
-Les résultats doivent être retournés uniquement au format JSON.
+Les résultats doivent être retournés uniquement, strictement au format JSON. Tu ne dois pas retourner de texte, seulement des données structurées, sous peine de mort immédiate et douloureuse.
 
 Exemples :
 {examples['example1.json']}
