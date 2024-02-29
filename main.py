@@ -88,7 +88,7 @@ def extract_information(pdf_path):
     # save the result in the csv file of the output folder
     print(result["code_ISIN"])
     if result["code_ISIN"] in data['code_ISIN'].values:
-        # print(f"Le document avec l'ISIN {result['code_ISIN']} déjà été traité")
+        print(f"Le document avec l'ISIN {result['code_ISIN']} déjà été traité")
         # check the date of the last update : more than 1 month we update the data
         last_update = data[data['code_ISIN'] == result['code_ISIN']]['date_actualisation'].values[0]
         if pd.to_datetime("today") - pd.to_datetime(last_update) > pd.Timedelta(30, unit='D'):
@@ -109,16 +109,17 @@ def extract_information(pdf_path):
  # ---------- MAIN ---------------------------
 # list all the files in the input folder and extract the information from them
 def main():
-    banques = ["Natixis", "Goldmann", "BNP", "SG"]
+    banques = ["CA - LCL"]#, "Natixis", "Goldmann", "BNP", "SG"]
     for b in banques:
         counter = 0
         files = os.listdir(f"input/{b}/")
+        files.sort()
         for file in files:
             pdf_path = os.getcwd() + f"/input/{b}/{file}"
             print(pdf_path)
             extract_information(pdf_path)
             counter += 1
-            if counter == 50:
+            if counter == 75:
                 break
 
 
