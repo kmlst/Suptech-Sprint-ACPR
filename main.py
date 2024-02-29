@@ -37,7 +37,7 @@ def extract_information(pdf_path):
     # the system context is contained in config.py in the variable prompt_example
     message_text = [{"role":"system","content":prompt_example},{"role":"user","content":treated_pdf}]
     response = client.chat.completions.create(
-    model="gpt-35-turbo", 
+    model="gpt-4-turbo", 
     messages = message_text,
     temperature=0.,
     max_tokens=1400,
@@ -109,18 +109,17 @@ def extract_information(pdf_path):
  # ---------- MAIN ---------------------------
 # list all the files in the input folder and extract the information from them
 def main():
-    banques = ["Goldmann", "BNP", "Natixis", "SG"]
+    banques = ["Natixis", "Goldmann", "BNP", "SG"]
     for b in banques:
-        i = 1
+        counter = 0
         files = os.listdir(f"input/{b}/")
-        if i < 5:
-            for file in files:
-                pdf_path = os.getcwd() + f"/input/{b}/{file}"
-                print(pdf_path)
-                extract_information(pdf_path)
-                i += 1
-                if i > 5:
-                    break
+        for file in files:
+            pdf_path = os.getcwd() + f"/input/{b}/{file}"
+            print(pdf_path)
+            extract_information(pdf_path)
+            counter += 1
+            if counter == 50:
+                break
 
 
 if __name__== '__main__':
