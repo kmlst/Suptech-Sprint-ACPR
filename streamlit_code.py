@@ -54,7 +54,7 @@ def dashboard(data):
     st.title("Synthèse DIC")
 
     # Sidebar for selecting fields
-    st.sidebar.header("Select Fields and Apply Filters")
+    # st.sidebar.header("Select Fields and Apply Filters")
     
     numerical_fields = data.select_dtypes(include=['float64', 'int64']).columns
     categorical_fields = data.select_dtypes(include=['object']).columns
@@ -91,12 +91,12 @@ def dashboard(data):
                 for j, old_field in enumerate(all_fields[i:i+num_cols]):
                     field = list(map_name.keys())[list(map_name.values()).index(old_field)]   
                     if field in numerical_fields:
-                        fig = px.histogram(filtered_data, x=field, title=f"{map_name[field]}")
-                        cols[j].plotly_chart(fig)
+                        fig = px.histogram(filtered_data, x=field, title=f"{map_name[field]}", )
+                        cols[j].plotly_chart(fig, use_container_width=True)
                     else:
                         fig = px.histogram(filtered_data, x=field, title=f"{map_name[field]}")
                         fig.update_xaxes(categoryorder="total descending")
-                        cols[j].plotly_chart(fig)
+                        cols[j].plotly_chart(fig, use_container_width=True)
 
             # Hide unused axes
             for j in range(num_plots, len(axes)):
@@ -117,6 +117,7 @@ if __name__ == "__main__":
 
     # Get current tab from URL query parameters
     current_tab = "Summary"
+    st.image('logo.jpg', width=100)
 
     # Create a layout with two columns for the buttons
     # st.query_params["tab"] = "Summary"    
